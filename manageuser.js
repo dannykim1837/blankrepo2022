@@ -1,20 +1,25 @@
 //© 2021 Sean Murdock
 
-let userName = "";
-let password = "";
+let phonenumber = "";
+let onetimepassword = "";
 let verifypassword = "";
 let passwordRegEx=/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{6,40})/;
 
-function setusername(){
-    userName = $("#username").val();
+function setphonenumber(){
+    phonenumber = $("#phonenumber").val();
 }
 
-function setuserpassword(){
-    password = $("#password").val();
-    var valid=passwordRegEx.exec(password);
-    if (!valid){
-        alert('Must be 6 digits, upper, lower, number, and symbol');
-    }
+const sendText=()=>{
+    $.ajax({
+         type: 'POST',
+         url: 'https://dev.stedi.me/twofactorlogin/'+phonenumber,
+         contentType: "application/text",
+         dataType: 'text' 
+    });
+}
+function setonetimepassword(){
+    onetimepassword = $("#onetimepassword").val();
+
 }
 
 function setverifypassword(){
@@ -47,12 +52,12 @@ function checkexpiredtoken(token){
 }
 
 function userlogin(){
-    setuserpassword();
-    setusername();
+    setonetimepassword();
+    setphonenumber();
     $.ajax({
         type: 'POST',
-        url: 'https://dev.stedi.me/login',
-        data: JSON.stringify({userName, password}),
+        url: 'https://dev.stedi.me/twofactorlogin',
+        data: JSON.stringify({phoneNumber:phonenumber, oneTimePassword:onetimepassword}),
         success: function(data) {
             window.location.href = "/timer.html#"+data;//add the token to the url
         },
@@ -106,7 +111,7 @@ function createuser(){
 function getstephistory(){
       $.ajax({
             type: 'POST',
-            url: 'https://ssev.stedi.me/stephistory',
+            url: 'https://dev.stedi.me/stephistory',
             data: JSON.stringify({userName}),
             success: function(data) { alert(data);
             json = $.parseJSON(data);
@@ -123,6 +128,6 @@ var enterFunction = (event) =>{
     }
 }
 
-var passwordField = document.getElementById("password");
+var passwordField = document.getElementById("onetimepassword");
 
 passwordField.addEventListener("keyup", enterFunction);
